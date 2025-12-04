@@ -14,9 +14,7 @@
     />
 
     <style>
-        * {
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; }
 
         body {
             margin: 0;
@@ -99,7 +97,7 @@
             </div>
             <div id="map"></div>
             <div class="footer">
-                Postal Map (Virus_City) · Leaflet
+                Detailed Postal Map · Leaflet
             </div>
         </div>
     </div>
@@ -112,39 +110,36 @@
     </script>
 
     <script>
-        // Fertige Postal-Karte (Full.png aus dem CFX-Forum)
-        // Wenn du später eine eigene Postal-Map nutzt, hier nur die URL ändern:
-        var imageUrl = "https://termanatorinc.com/images/Full.png";
+        // Name deiner Postal-Map-Datei im Repo
+        var imageUrl = 'postal-map.png';
 
-        // Wir nutzen ein simples eigenes Koordinatensystem 0..1000 x 0..1000.
-        // Das Bild wird da einfach reingesetzt und behält dabei sein Seitenverhältnis.
-        var map = L.map("map", {
+        // 🔧 Breite/Höhe der PNG-Datei in Pixeln eintragen
+        // Rechtsklick auf die Datei -> Eigenschaften -> Details -> Abmessungen
+        var imageWidth = 3000;  // BEISPIEL: anpassen!
+        var imageHeight = 2000; // BEISPIEL: anpassen!
+
+        // Leaflet-Karte mit einfachem Bild-Koordinatensystem
+        var map = L.map('map', {
             crs: L.CRS.Simple,
             minZoom: -2,
-            maxZoom: 2,
+            maxZoom: 2
         });
 
-        // „Kartenrahmen“ festlegen
-        var bounds = [[0, 0], [1000, 1000]];
+        // Bildgrenzen anhand der Pixelgröße berechnen
+        var maxZoom = map.getMaxZoom();
+        var southWest = map.unproject([0, imageHeight], maxZoom);
+        var northEast = map.unproject([imageWidth, 0], maxZoom);
+        var bounds = new L.LatLngBounds(southWest, northEast);
 
         // Bild als Overlay einfügen
         L.imageOverlay(imageUrl, bounds).addTo(map);
 
-        // Auf komplette Karte zoomen & begrenzen
+        // Auf komplette Karte zoomen & Begrenzung setzen
         map.fitBounds(bounds);
         map.setMaxBounds(bounds);
 
-        // 🔥 Später können wir hier einen Marker für deine Wache bei 8230 setzen,
-        // wenn du willst. Erstmal bleibt die Karte clean ohne Marker.
-        //
-        // Beispiel (nur als Vorlage, NOCH NICHT AKTIV):
-        //
-        // var wachePixel = [500, 600]; // X/Y im 0..1000-System
-        // var wacheLatLng = L.latLng(
-        //     bounds[0][0] + (bounds[1][0] - bounds[0][0]) * (wachePixel[1] / 1000),
-        //     bounds[0][1] + (bounds[1][1] - bounds[0][1]) * (wachePixel[0] / 1000)
-        // );
-        // L.marker(wacheLatLng).addTo(map).bindPopup("Feuerwache 8230");
+        // 🔥 Später setzen wir hier einen Marker bei 8230,
+        // wenn wir die ungefähren Pixel-Koordinaten haben.
     </script>
 </body>
 </html>
