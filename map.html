@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="utf-8">
-    <title>RP-Server – GTA V Karte</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8" />
+    <title>Feuerwehr RP – Postal Karte</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <!-- Leaflet CSS -->
     <link
@@ -13,25 +13,96 @@
         crossorigin=""
     />
 
-    <!-- Kleine Grundstyles -->
     <style>
-        html, body {
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
             margin: 0;
             padding: 0;
-            height: 100%;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+                sans-serif;
+            background: radial-gradient(circle at top, #1b2745 0, #050810 55%, #020308 100%);
+            color: #f5f5f5;
+        }
+
+        .wrapper {
             width: 100%;
+            max-width: 1100px;
+            padding: 16px;
         }
+
+        .card {
+            background: rgba(5, 8, 20, 0.96);
+            border-radius: 18px;
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.7);
+            padding: 18px 20px 20px;
+            border: 1px solid rgba(93, 173, 255, 0.35);
+            backdrop-filter: blur(10px);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 10px;
+        }
+
+        .title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+        }
+
+        .subtitle {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
         #map {
-            height: 100vh; /* ganze Höhe */
-            width: 100vw;  /* ganze Breite */
+            width: 100%;
+            height: 580px;
+            border-radius: 14px;
+            overflow: hidden;
+            position: relative;
         }
-        body {
-            background: #000;
+
+        .leaflet-container {
+            background: #02030a;
+        }
+
+        .footer {
+            margin-top: 8px;
+            font-size: 0.75rem;
+            opacity: 0.7;
+            text-align: right;
+        }
+
+        @media (max-width: 768px) {
+            #map {
+                height: 420px;
+            }
         }
     </style>
 </head>
 <body>
-    <div id="map"></div>
+    <div class="wrapper">
+        <div class="card">
+            <div class="card-header">
+                <div class="title">Feuerwehr RP – Postal&nbsp;Karte</div>
+                <div class="subtitle">Wache bei PLZ 8230 (Marker kommt später)</div>
+            </div>
+            <div id="map"></div>
+            <div class="footer">
+                Postal Map (Virus_City) · Leaflet
+            </div>
+        </div>
+    </div>
 
     <!-- Leaflet JS -->
     <script
@@ -41,34 +112,39 @@
     </script>
 
     <script>
-        // Karte mit einfachem Koordinatensystem (Bildkarte)
-        var map = L.map('map', {
+        // Fertige Postal-Karte (Full.png aus dem CFX-Forum)
+        // Wenn du später eine eigene Postal-Map nutzt, hier nur die URL ändern:
+        var imageUrl = "https://termanatorinc.com/images/Full.png";
+
+        // Wir nutzen ein simples eigenes Koordinatensystem 0..1000 x 0..1000.
+        // Das Bild wird da einfach reingesetzt und behält dabei sein Seitenverhältnis.
+        var map = L.map("map", {
             crs: L.CRS.Simple,
-            minZoom: 2,
-            maxZoom: 7
+            minZoom: -2,
+            maxZoom: 2,
         });
 
-        // GTA V Tiles (Straßenkarte – öffentliches Tileset)
-        // Quelle: öffentliches GTA5-Map Tiles Projekt
-        var tiles = L.tileLayer('https://gta5-map.github.io/tiles/road/{z}-{x}_{y}.png', {
-            tileSize: 256,
-            noWrap: true,
-            minZoom: 2,
-            maxZoom: 7
-        }).addTo(map);
+        // „Kartenrahmen“ festlegen
+        var bounds = [[0, 0], [1000, 1000]];
 
-        // Bildgröße der Map (Annahme: 8192 x 8192 px, Standard in vielen GTA-Tiles)
-        var maxZoom = map.getMaxZoom();
-        var southWest = map.unproject([0, 8192], maxZoom);
-        var northEast = map.unproject([8192, 0], maxZoom);
-        var bounds = new L.LatLngBounds(southWest, northEast);
+        // Bild als Overlay einfügen
+        L.imageOverlay(imageUrl, bounds).addTo(map);
 
-        map.setMaxBounds(bounds);
+        // Auf komplette Karte zoomen & begrenzen
         map.fitBounds(bounds);
+        map.setMaxBounds(bounds);
 
-        // Später: Hier können wir Marker für eure Wache einfügen
-        // Beispiel:
-        // var wacheMarker = L.marker([LAT, LNG]).addTo(map).bindPopup("Unsere Feuerwache");
+        // 🔥 Später können wir hier einen Marker für deine Wache bei 8230 setzen,
+        // wenn du willst. Erstmal bleibt die Karte clean ohne Marker.
+        //
+        // Beispiel (nur als Vorlage, NOCH NICHT AKTIV):
+        //
+        // var wachePixel = [500, 600]; // X/Y im 0..1000-System
+        // var wacheLatLng = L.latLng(
+        //     bounds[0][0] + (bounds[1][0] - bounds[0][0]) * (wachePixel[1] / 1000),
+        //     bounds[0][1] + (bounds[1][1] - bounds[0][1]) * (wachePixel[0] / 1000)
+        // );
+        // L.marker(wacheLatLng).addTo(map).bindPopup("Feuerwache 8230");
     </script>
 </body>
 </html>
