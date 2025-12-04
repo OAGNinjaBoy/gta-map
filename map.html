@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="utf-8">
+    <title>RP-Server – GTA V Karte</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Leaflet CSS -->
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        crossorigin=""
+    />
+
+    <!-- Kleine Grundstyles -->
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+        }
+        #map {
+            height: 100vh; /* ganze Höhe */
+            width: 100vw;  /* ganze Breite */
+        }
+        body {
+            background: #000;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+
+    <!-- Leaflet JS -->
+    <script
+        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin="">
+    </script>
+
+    <script>
+        // Karte mit einfachem Koordinatensystem (Bildkarte)
+        var map = L.map('map', {
+            crs: L.CRS.Simple,
+            minZoom: 2,
+            maxZoom: 7
+        });
+
+        // GTA V Tiles (Straßenkarte – öffentliches Tileset)
+        // Quelle: öffentliches GTA5-Map Tiles Projekt
+        var tiles = L.tileLayer('https://gta5-map.github.io/tiles/road/{z}-{x}_{y}.png', {
+            tileSize: 256,
+            noWrap: true,
+            minZoom: 2,
+            maxZoom: 7
+        }).addTo(map);
+
+        // Bildgröße der Map (Annahme: 8192 x 8192 px, Standard in vielen GTA-Tiles)
+        var maxZoom = map.getMaxZoom();
+        var southWest = map.unproject([0, 8192], maxZoom);
+        var northEast = map.unproject([8192, 0], maxZoom);
+        var bounds = new L.LatLngBounds(southWest, northEast);
+
+        map.setMaxBounds(bounds);
+        map.fitBounds(bounds);
+
+        // Später: Hier können wir Marker für eure Wache einfügen
+        // Beispiel:
+        // var wacheMarker = L.marker([LAT, LNG]).addTo(map).bindPopup("Unsere Feuerwache");
+    </script>
+</body>
+</html>
